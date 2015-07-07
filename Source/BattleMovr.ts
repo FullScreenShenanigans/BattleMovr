@@ -13,38 +13,84 @@ module BattleMovr {
     "use strict";
 
     export class BattleMovr implements IBattleMovr {
+        /**
+         * 
+         */
         private GameStarter: GameStartr.IGameStartr;
-
+        
+        /**
+         * 
+         */
         private MenuGrapher: MenuGraphr.IMenuGraphr;
-
-        private things;
-
-        private backgroundType;
-
-        private backgroundThing;
-
-        private battleMenuName;
-
-        private battleOptionNames;
-
-        private menuNames;
-
-        private battleInfo;
-
-        private inBattle;
-
-        private defaults;
-
-        private positions;
-
-        private openItemsMenuCallback;
-
-        private openActorsMenuCallback;
+        
+        /**
+         * 
+         */
+        private things: {
+            [i: string]: IThing;
+        };
+        
+        /**
+         * 
+         */
+        private backgroundType: string;
+        
+        /**
+         * 
+         */
+        private backgroundThing: IThing;
+        
+        /**
+         * 
+         */
+        private battleMenuName: string;
+        
+        /**
+         * 
+         */
+        private battleOptionNames: any;
+        
+        /**
+         * 
+         */
+        private menuNames: any;
+        
+        /**
+         * 
+         */
+        private battleInfo: IBattleInfo;
+        
+        /**
+         * 
+         */
+        private inBattle: boolean;
+        
+        /**
+         * 
+         */
+        private defaults: IBattleInfoDefaults;
+        
+        /**
+         * 
+         */
+        private positions: {
+            [i: string]: IPosition;
+        };
+        
+        /**
+         * 
+         */
+        private openItemsMenuCallback: (settings: any) => void;
+        
+        /**
+         * 
+         */
+        private openActorsMenuCallback: (settings: any) => void;
 
         /**
          * 
          */
-        constructor(settings: any) {
+        constructor(settings: IBattleMovrSettings) {
             if (typeof settings.GameStarter === "undefined") {
                 throw new Error("No GameStarter given to BattleMovr.");
             }
@@ -82,49 +128,49 @@ module BattleMovr {
         /**
          * 
          */
-        getGameStarter() {
+        getGameStarter(): GameStartr.IGameStartr {
             return this.GameStarter;
         }
 
         /**
          * 
          */
-        getThings() {
+        getThings(): { [i: string]: IThing } {
             return this.things;
         }
 
         /**
          * 
          */
-        getThing(name) {
+        getThing(name: string): IThing {
             return this.things[name];
         }
 
         /**
          * 
          */
-        getBattleInfo() {
+        getBattleInfo(): IBattleInfo {
             return this.battleInfo;
         }
 
         /**
          * 
          */
-        getBackgroundType() {
+        getBackgroundType(): string {
             return this.backgroundType;
         }
 
         /**
          * 
          */
-        getBackgroundThing() {
+        getBackgroundThing(): IThing {
             return this.backgroundThing;
         }
 
         /**
          * 
          */
-        getInBattle() {
+        getInBattle(): boolean {
             return this.inBattle;
         }
 
@@ -135,7 +181,7 @@ module BattleMovr {
         /**
          * 
          */
-        startBattle(settings) {
+        startBattle(settings: IBattleSettings): void {
             if (this.inBattle) {
                 return;
             }
@@ -155,7 +201,7 @@ module BattleMovr {
             });
             this.MenuGrapher.createMenu("BattleDisplayInitial");
 
-            this.things.menu = this.MenuGrapher.getMenu("BattleDisplayInitial");
+            this.things["menu"] = this.MenuGrapher.getMenu("BattleDisplayInitial");
             this.setThing("opponent", this.battleInfo.opponent.sprite);
             this.setThing("player", this.battleInfo.player.sprite);
 
@@ -170,7 +216,7 @@ module BattleMovr {
         /**
          * 
          */
-        closeBattle(callback?) {
+        closeBattle(callback?: () => void): void {
             var i: string;
 
             if (!this.inBattle) {
@@ -210,7 +256,7 @@ module BattleMovr {
         /**
          * 
          */
-        showPlayerMenu() {
+        showPlayerMenu(): void {
             this.MenuGrapher.createMenu("BattleOptions", {
                 "ignoreB": true
             });
@@ -238,9 +284,9 @@ module BattleMovr {
          * 
          */
         setThing(name: string, title: string, settings?: any): GameStartr.IThing {
-            var position = this.positions[name] || {},
-                battleMenu = this.MenuGrapher.getMenu(this.battleMenuName),
-                thing = this.things[name];
+            var position: IPosition = this.positions[name] || {},
+                battleMenu: IMenu = this.MenuGrapher.getMenu(this.battleMenuName),
+                thing: IThing = this.things[name];
 
             if (thing) {
                 this.GameStarter.killNormal(thing);
@@ -267,17 +313,18 @@ module BattleMovr {
         /**
          * 
          */
-        openMovesMenu() {
-            var actorMoves = this.battleInfo.player.selectedActor.moves,
-                moveOptions = [],
-                move, i;
+        openMovesMenu(): void {
+            var actorMoves: IMove[] = this.battleInfo.player.selectedActor.moves,
+                moveOptions: any[] = [],
+                move: IMove,
+                i: number;
 
             for (i = 0; i < actorMoves.length; i += 1) {
                 move = actorMoves[i];
                 moveOptions[i] = {
                     "text": move.title.toUpperCase(),
                     "remaining": move.remaining,
-                    "callback": this.playMove.bind(self, move.title)
+                    "callback": this.playMove.bind(this, move.title)
                 };
             }
 
@@ -319,7 +366,7 @@ module BattleMovr {
         /**
          * 
          */
-        openActorsMenu(callback) {
+        openActorsMenu(callback: (settings: any) => void): void {
             this.openActorsMenuCallback({
                 "backMenu": "BattleOptions",
                 "container": "Battle",
@@ -333,11 +380,17 @@ module BattleMovr {
         /**
          * 
          */
-        playMove(choicePlayer) {
+        playMove(choicePlayer: string): void {
             var choiceOpponent = this.GameStarter.MathDecider.compute(
-                "opponentMove", this.battleInfo.player, this.battleInfo.opponent),
+                    "opponentMove",
+                    this.battleInfo.player,
+                    this.battleInfo.opponent),
                 playerMovesFirst = this.GameStarter.MathDecider.compute(
-                    "playerMovesFirst", this.battleInfo.player, choicePlayer, this.battleInfo.opponent, choiceOpponent);
+                    "playerMovesFirst",
+                    this.battleInfo.player,
+                    choicePlayer,
+                    this.battleInfo.opponent,
+                    choiceOpponent);
 
             if (playerMovesFirst) {
                 this.GameStarter.ScenePlayer.playRoutine("MovePlayer", {
@@ -357,7 +410,7 @@ module BattleMovr {
         /**
          * 
          */
-        switchActor(battlerName, i) {
+        switchActor(battlerName: string, i: number): void {
             var battler = this.battleInfo[battlerName];
 
             if (battler.selectedIndex === i) {
@@ -379,7 +432,7 @@ module BattleMovr {
         /**
          * 
          */
-        startBattleExit() {
+        startBattleExit(): void {
             if (this.battleInfo.opponent.category === "Trainer") {
                 this.GameStarter.ScenePlayer.playRoutine("BattleExitFail");
                 return;
@@ -400,7 +453,7 @@ module BattleMovr {
         /**
          * 
          */
-        createBackground() {
+        createBackground(): void {
             if (!this.backgroundType) {
                 return;
             }
@@ -419,7 +472,7 @@ module BattleMovr {
         /**
          * 
          */
-        deleteBackground() {
+        deleteBackground(): void {
             if (this.backgroundThing) {
                 this.GameStarter.killNormal(this.backgroundThing);
             }
