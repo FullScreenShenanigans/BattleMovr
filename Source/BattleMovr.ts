@@ -27,8 +27,8 @@ module BattleMovr {
          * 
          */
         private things: {
-            menu?: IThing;
             [i: string]: IThing;
+            menu?: IThing;
         };
 
         /**
