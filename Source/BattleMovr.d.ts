@@ -4,6 +4,11 @@ declare module BattleMovr {
         top?: number;
     }
 
+    export interface IThingsContainer {
+        [i: string]: IThing;
+        menu ?: IThing;
+    }
+
     export interface IThing extends GameStartr.IThing { }
 
     export interface IMenu extends IThing { }

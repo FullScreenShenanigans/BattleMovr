@@ -26,10 +26,7 @@ module BattleMovr {
         /**
          * 
          */
-        private things: {
-            [i: string]: IThing;
-            menu?: IThing;
-        };
+        private things: IThingsContainer;
 
         /**
          * 
