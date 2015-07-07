@@ -17,71 +17,72 @@ module BattleMovr {
          * 
          */
         private GameStarter: GameStartr.IGameStartr;
-        
+
         /**
          * 
          */
         private MenuGrapher: MenuGraphr.IMenuGraphr;
-        
+
         /**
          * 
          */
         private things: {
+            menu?: IThing;
             [i: string]: IThing;
         };
-        
+
         /**
          * 
          */
         private backgroundType: string;
-        
+
         /**
          * 
          */
         private backgroundThing: IThing;
-        
+
         /**
          * 
          */
         private battleMenuName: string;
-        
+
         /**
          * 
          */
         private battleOptionNames: any;
-        
+
         /**
          * 
          */
         private menuNames: any;
-        
+
         /**
          * 
          */
         private battleInfo: IBattleInfo;
-        
+
         /**
          * 
          */
         private inBattle: boolean;
-        
+
         /**
          * 
          */
         private defaults: IBattleInfoDefaults;
-        
+
         /**
          * 
          */
         private positions: {
             [i: string]: IPosition;
         };
-        
+
         /**
          * 
          */
         private openItemsMenuCallback: (settings: any) => void;
-        
+
         /**
          * 
          */
@@ -201,7 +202,7 @@ module BattleMovr {
             });
             this.MenuGrapher.createMenu("BattleDisplayInitial");
 
-            this.things["menu"] = this.MenuGrapher.getMenu("BattleDisplayInitial");
+            this.things.menu = this.MenuGrapher.getMenu("BattleDisplayInitial");
             this.setThing("opponent", this.battleInfo.opponent.sprite);
             this.setThing("player", this.battleInfo.player.sprite);
 
@@ -226,7 +227,9 @@ module BattleMovr {
             this.inBattle = false;
 
             for (i in this.things) {
-                this.GameStarter.killNormal(this.things[i]);
+                if (this.things.hasOwnProperty(i)) {
+                    this.GameStarter.killNormal(this.things[i]);
+                }
             }
 
             this.deleteBackground();
@@ -263,16 +266,16 @@ module BattleMovr {
 
             this.MenuGrapher.addMenuList("BattleOptions", {
                 "options": [{
-                    "text": this.battleOptionNames["moves"],
+                    "text": this.battleOptionNames.moves,
                     "callback": this.openMovesMenu
                 }, {
-                        "text": this.battleOptionNames["items"],
+                        "text": this.battleOptionNames.items,
                         "callback": this.openItemsMenu
                     }, {
-                        "text": this.battleOptionNames["actors"],
+                        "text": this.battleOptionNames.actors,
                         "callback": this.openActorsMenu
                     }, {
-                        "text": this.battleOptionNames["exit"],
+                        "text": this.battleOptionNames.exit,
                         "callback": this.startBattleExit
                     }]
             });
@@ -344,7 +347,7 @@ module BattleMovr {
         /**
          * 
          */
-        openItemsMenu() {
+        openItemsMenu(): void {
             this.openItemsMenuCallback({
                 "items": this.battleInfo.items,
                 "position": {
@@ -381,11 +384,11 @@ module BattleMovr {
          * 
          */
         playMove(choicePlayer: string): void {
-            var choiceOpponent = this.GameStarter.MathDecider.compute(
-                    "opponentMove",
-                    this.battleInfo.player,
-                    this.battleInfo.opponent),
-                playerMovesFirst = this.GameStarter.MathDecider.compute(
+            var choiceOpponent: string = this.GameStarter.MathDecider.compute(
+                "opponentMove",
+                this.battleInfo.player,
+                this.battleInfo.opponent),
+                playerMovesFirst: boolean = this.GameStarter.MathDecider.compute(
                     "playerMovesFirst",
                     this.battleInfo.player,
                     choicePlayer,
@@ -411,7 +414,7 @@ module BattleMovr {
          * 
          */
         switchActor(battlerName: string, i: number): void {
-            var battler = this.battleInfo[battlerName];
+            var battler: IBattleThingInfo = this.battleInfo[battlerName];
 
             if (battler.selectedIndex === i) {
                 this.GameStarter.ScenePlayer.playRoutine("PlayerSwitchesSamePokemon");
