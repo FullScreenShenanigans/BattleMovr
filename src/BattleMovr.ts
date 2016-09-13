@@ -2,8 +2,9 @@
 /// <reference path="../typings/MenuGraphr.d.ts" />
 
 import {
-    IBattleInfo, IBattleInfoDefaults, IBattleMovr, IBattleMovrSettings, IBattleSettings,
-    IBattleThingInfo, IGameStartr, IMove, IPosition, IThing, IThingsContainer
+    IBattleInfo, IBattleInfoDefaults, IBattleMovr, IBattleMovrSettings,
+    IBattleOptions, IBattler, IBattleSettings, IGameStartr, IMenuNames,
+    IPosition, IThing, IThingsContainer
 } from "./IBattleMovr";
 
 /**
@@ -11,7 +12,7 @@ import {
  */
 export class BattleMovr implements IBattleMovr {
     /**
-     * The IGameStartr providing Thing and actor informtaion.
+     * The IGameStartr providing Thing and actor information.
      */
     private GameStarter: IGameStartr;
 
@@ -26,24 +27,19 @@ export class BattleMovr implements IBattleMovr {
     private backgroundType: string;
 
     /**
-     * 
+     * The created Thing used as the background.
      */
     private backgroundThing: IThing;
 
     /**
      * 
      */
-    private battleMenuName: string;
+    private battleOptions: IBattleOptions;
 
     /**
      * 
      */
-    private battleOptionNames: any;
-
-    /**
-     * 
-     */
-    private menuNames: any;
+    private menuNames: IMenuNames;
 
     /**
      * 
@@ -73,6 +69,8 @@ export class BattleMovr implements IBattleMovr {
     private openItemsMenuCallback: (settings: any) => void;
 
     /**
+     * Callback to open the actors menu.
+     * 
      * 
      */
     private openActorsMenuCallback: (settings: any) => void;
@@ -84,19 +82,15 @@ export class BattleMovr implements IBattleMovr {
         if (typeof settings.GameStarter === "undefined") {
             throw new Error("No GameStarter given to BattleMovr.");
         }
-        if (typeof settings.battleMenuName === "undefined") {
-            throw new Error("No battleMenuName given to BattleMovr.");
-        }
-        if (typeof settings.battleOptionNames === "undefined") {
-            throw new Error("No battleOptionNames given to BattleMovr.");
+        if (typeof settings.battleOptions === "undefined") {
+            throw new Error("No battleOptions given to BattleMovr.");
         }
         if (typeof settings.menuNames === "undefined") {
             throw new Error("No menuNames given to BattleMovr.");
         }
 
         this.GameStarter = settings.GameStarter;
-        this.battleMenuName = settings.battleMenuName;
-        this.battleOptionNames = settings.battleOptionNames;
+        this.battleOptions = settings.battleOptions;
         this.menuNames = settings.menuNames;
         this.openItemsMenuCallback = settings.openItemsMenuCallback;
         this.openActorsMenuCallback = settings.openActorsMenuCallback;
@@ -119,6 +113,13 @@ export class BattleMovr implements IBattleMovr {
     /**
      * 
      */
+    public getDefaults(): IBattleInfoDefaults {
+        return this.defaults;
+    }
+
+    /**
+     * 
+     */
     public getThings(): IThingsContainer {
         return this.things;
     }
@@ -128,6 +129,13 @@ export class BattleMovr implements IBattleMovr {
      */
     public getThing(name: string): IThing {
         return this.things[name];
+    }
+
+    /**
+     * 
+     */
+    public getMenuNames(): IMenuNames {
+        return this.menuNames;
     }
 
     /**
@@ -167,36 +175,35 @@ export class BattleMovr implements IBattleMovr {
         }
 
         this.inBattle = true;
-
         this.battleInfo = this.GameStarter.utilities.proliferate({}, this.defaults);
 
         // A shallow copy is used here for performance, and so Things in .keptThings
         // don't cause an infinite loop proliferating
         for (const i in settings) {
             if (settings.hasOwnProperty(i)) {
-                (this.battleInfo as any)[i] = (settings as any)[i];
+                this.battleInfo.battlers[i] = (settings as any)[i];
             }
         }
 
-        this.battleInfo.player.selectedActor = this.battleInfo.player.actors[0];
-        this.battleInfo.opponent.selectedActor = this.battleInfo.opponent.actors[0];
+        this.battleInfo.battlers.player.selectedActor = this.battleInfo.battlers.player.actors[0];
+        this.battleInfo.battlers.opponent.selectedActor = this.battleInfo.battlers.opponent.actors[0];
 
         this.createBackground();
 
         this.GameStarter.MenuGrapher.createMenu("Battle", {
-            "ignoreB": true
+            ignoreB: true
         });
         this.GameStarter.MenuGrapher.createMenu("BattleDisplayInitial");
 
         this.things.menu = this.GameStarter.MenuGrapher.getMenu("BattleDisplayInitial");
-        this.setThing("opponent", this.battleInfo.opponent.sprite);
-        this.setThing("player", this.battleInfo.player.sprite);
+        this.setThing("opponent", this.battleInfo.battlers.opponent.sprite);
+        this.setThing("player", this.battleInfo.battlers.player.sprite);
 
         this.GameStarter.ScenePlayer.startCutscene("Battle", {
-            "things": this.things,
-            "battleInfo": this.battleInfo,
-            "nextCutscene": settings.nextCutscene,
-            "nextCutsceneSettings": settings.nextCutsceneSettings
+            things: this.things,
+            battleInfo: this.battleInfo,
+            nextCutscene: settings.nextCutscene,
+            nextCutsceneSettings: settings.nextCutsceneSettings
         });
     }
 
@@ -218,7 +225,6 @@ export class BattleMovr implements IBattleMovr {
 
         this.deleteBackground();
 
-        (this.GameStarter.MapScreener as any).inMenu = false;
         this.GameStarter.MenuGrapher.deleteMenu("Battle");
         this.GameStarter.MenuGrapher.deleteMenu("GeneralText");
         this.GameStarter.MenuGrapher.deleteMenu("BattleOptions");
@@ -245,24 +251,17 @@ export class BattleMovr implements IBattleMovr {
      */
     public showPlayerMenu(): void {
         this.GameStarter.MenuGrapher.createMenu("BattleOptions", {
-            "ignoreB": true
+            ignoreB: true
         });
 
         this.GameStarter.MenuGrapher.addMenuList("BattleOptions", {
-            "options": [
-                {
-                    "text": this.battleOptionNames.moves,
-                    "callback": this.openMovesMenu.bind(this)
-                }, {
-                    "text": this.battleOptionNames.items,
-                    "callback": this.openItemsMenu.bind(this)
-                }, {
-                    "text": this.battleOptionNames.actors,
-                    "callback": this.openActorsMenu.bind(this)
-                }, {
-                    "text": this.battleOptionNames.exit,
-                    "callback": this.startBattleExit.bind(this)
-                }]
+            options: Object.keys(this.battleOptions)
+                .map((text: string): any => {
+                    return {
+                        text,
+                        callback: this.battleOptions[text].callback
+                    };
+                })
         });
 
         this.GameStarter.MenuGrapher.setActiveMenu("BattleOptions");
@@ -273,7 +272,7 @@ export class BattleMovr implements IBattleMovr {
      */
     public setThing(name: string, title: string, settings?: any): IThing {
         const position: IPosition = this.positions[name] || {};
-        const battleMenu: MenuGraphr.IMenu = this.GameStarter.MenuGrapher.getMenu(this.battleMenuName);
+        const battleMenu: MenuGraphr.IMenu = this.GameStarter.MenuGrapher.getMenu("Battles");
         let thing: IThing = this.things[name];
 
         if (thing) {
@@ -295,93 +294,30 @@ export class BattleMovr implements IBattleMovr {
     /**
      * 
      */
-    public openMovesMenu(): void {
-        const actorMoves: IMove[] = this.battleInfo.player.selectedActor.moves;
-        const moveOptions: any[] = [];
-
-        for (let i: number = 0; i < actorMoves.length; i += 1) {
-            const move: IMove = actorMoves[i];
-
-            moveOptions[i] = {
-                text: move.title.toUpperCase(),
-                remaining: move.remaining,
-                callback: (title: string): void => this.playMove(move.title)
-            };
-        }
-
-        for (let i: number = actorMoves.length; i < 4; i += 1) {
-            moveOptions[i] = {
-                "text": "-"
-            };
-        }
-
-        this.GameStarter.MenuGrapher.createMenu(this.menuNames.moves);
-        this.GameStarter.MenuGrapher.addMenuList(this.menuNames.moves, {
-            "options": moveOptions
-        });
-        this.GameStarter.MenuGrapher.setActiveMenu(this.menuNames.moves);
-    }
-
-    /**
-     * 
-     */
-    public openItemsMenu(): void {
-        this.openItemsMenuCallback({
-            "items": this.battleInfo.items,
-            "position": {
-                "horizontal": "right",
-                "vertical": "bottom",
-                "offset": {
-                    "left": 0
-                }
-            },
-            "size": {
-                "height": 44
-            },
-            "container": "Battle",
-            "backMenu": "BattleOptions",
-            "scrollingItems": 4
-        });
-    }
-
-    /**
-     * 
-     */
-    public openActorsMenu(callback: (settings: any) => void): void {
-        this.openActorsMenuCallback({
-            "backMenu": "BattleOptions",
-            "container": "Battle",
-            "onSwitch": this.switchActor.bind(this)
-        });
-    }
-
-    /**
-     * 
-     */
     public playMove(choicePlayer: string): void {
         const choiceOpponent: string = this.GameStarter.MathDecider.compute(
             "opponentMove",
-            this.battleInfo.player,
-            this.battleInfo.opponent);
+            this.battleInfo.battlers.player,
+            this.battleInfo.battlers.opponent);
 
         const playerMovesFirst: boolean = this.GameStarter.MathDecider.compute(
             "playerMovesFirst",
-            this.battleInfo.player,
+            this.battleInfo.battlers.player,
             choicePlayer,
-            this.battleInfo.opponent,
+            this.battleInfo.battlers.opponent,
             choiceOpponent);
 
         if (playerMovesFirst) {
             this.GameStarter.ScenePlayer.playRoutine("MovePlayer", {
-                "nextRoutine": "MoveOpponent",
-                "choicePlayer": choicePlayer,
-                "choiceOpponent": choiceOpponent
+                extRoutine: "MoveOpponent",
+                choicePlayer: choicePlayer,
+                choiceOpponent: choiceOpponent
             });
         } else {
             this.GameStarter.ScenePlayer.playRoutine("MoveOpponent", {
-                "nextRoutine": "MovePlayer",
-                "choicePlayer": choicePlayer,
-                "choiceOpponent": choiceOpponent
+                nextRoutine: "MovePlayer",
+                choicePlayer: choicePlayer,
+                choiceOpponent: choiceOpponent
             });
         }
     }
@@ -390,7 +326,7 @@ export class BattleMovr implements IBattleMovr {
      * 
      */
     public switchActor(battlerName: string, i: number): void {
-        const battler: IBattleThingInfo = (this.battleInfo as any)[battlerName];
+        const battler: IBattler = this.battleInfo.battlers[battlerName];
 
         if (battler.selectedIndex === i) {
             this.GameStarter.ScenePlayer.playRoutine("PlayerSwitchesSamePokemon");
@@ -401,23 +337,6 @@ export class BattleMovr implements IBattleMovr {
         battler.selectedActor = battler.actors[i];
 
         this.GameStarter.ScenePlayer.playRoutine((battlerName === "player" ? "Player" : "Opponent") + "SendOut");
-    }
-
-    /**
-     * 
-     */
-    public startBattleExit(): void {
-        if (this.battleInfo.opponent.category === "Trainer") {
-            this.GameStarter.ScenePlayer.playRoutine("BattleExitFail");
-            return;
-        }
-
-        this.GameStarter.MenuGrapher.deleteMenu("BattleOptions");
-        this.GameStarter.MenuGrapher.addMenuDialog(
-            "GeneralText",
-            this.battleInfo.exitDialog || this.defaults.exitDialog || "",
-            this.closeBattle.bind(this));
-        this.GameStarter.MenuGrapher.setActiveMenu("GeneralText");
     }
 
     /**

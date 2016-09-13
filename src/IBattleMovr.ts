@@ -1,8 +1,44 @@
 /// <reference path="../typings/GameStartr.d.ts" />
 /// <reference path="../typings/MenuGraphr.d.ts" />
+/// <reference path="../typings/MapScreenr.d.ts" />
 
+/**
+ * Extended IGameStartr with menus.
+ */
 export interface IGameStartr extends GameStartr.GameStartr {
+    /**
+     * In-game menu and dialog creation and management for GameStartr.
+     */
     MenuGrapher: MenuGraphr.IMenuGraphr;
+}
+
+/**
+ * Menus available during battle, keyed by name.
+ */
+export interface IBattleOptions {
+    [i: string]: IBattleOption;
+}
+
+/**
+ * Description of a menu available during battle.
+ */
+export interface IBattleOption {
+    /**
+     * A callback that opens the menu.
+     */
+    callback: () => void;
+
+    /**
+     * Text displayed in the options menu.
+     */
+    text: (string | MenuGraphr.IMenuWordCommand)[];
+}
+
+/**
+ * Names of known menus, such as those triggered by battle options.
+ */
+export interface IMenuNames {
+    moves: string;
 }
 
 export interface IPosition {
@@ -33,15 +69,28 @@ export interface IBattleInfo {
     nextCutsceneSettings?: any;
     nextRoutine?: string;
     nextRoutineSettings?: any;
-    opponent?: IBattleThingInfo;
-    player?: IBattleThingInfo;
+    battlers: IBattlers;
+}
+
+export interface IBattlers {
+    /**
+     * The opponent battler's information.
+     */
+    opponent?: IBattler;
+
+    /**
+     * The player's battle information.
+     */
+    player?: IBattler;
+
+    [i: /* "opponent" | "player" */ string]: IBattler;
 }
 
 export interface IBattleInfoDefaults {
     exitDialog: string;
 }
 
-export interface IBattleThingInfo {
+export interface IBattler {
     actors: IActor[];
     category: string;
     hasActors?: boolean;
@@ -98,8 +147,8 @@ export interface IMove {
 export interface IBattleMovrSettings {
     GameStarter: IGameStartr;
     battleMenuName: string;
-    battleOptionNames: string;
-    menuNames: string;
+    battleOptions: IBattleOptions;
+    menuNames: IMenuNames;
     openItemsMenuCallback: (settings: any) => void;
     openActorsMenuCallback: (settings: any) => void;
     defaults?: any;
@@ -112,8 +161,10 @@ export interface IBattleMovrSettings {
  */
 export interface IBattleMovr {
     getGameStarter(): IGameStartr;
+    getDefaults(): IBattleInfoDefaults;
     getThings(): { [i: string]: IThing };
     getThing(name: string): IThing;
+    getMenuNames(): IMenuNames;
     getBattleInfo(): IBattleInfo;
     getBackgroundType(): string;
     getBackgroundThing(): IThing;
@@ -122,12 +173,8 @@ export interface IBattleMovr {
     closeBattle(callback?: () => void): void;
     showPlayerMenu(): void;
     setThing(name: string, title: string, settings?: any): IThing;
-    openMovesMenu(): void;
-    openItemsMenu(): void;
-    openActorsMenu(callback: (settings: any) => void): void;
     playMove(choicePlayer: string): void;
     switchActor(battlerName: string, i: number): void;
-    startBattleExit(): void;
     createBackground(): void;
     deleteBackground(): void;
 }
