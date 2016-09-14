@@ -3,8 +3,8 @@
 
 import {
     IBattleInfo, IBattleInfoDefaults, IBattleMovr, IBattleMovrSettings,
-    IBattleOptions, IBattler, IBattleSettings, IGameStartr, IMenuNames,
-    IPosition, IThing, IThingsContainer
+    IBattleOption, IBattler, IGameStartr, IMenuNames, IPosition, IPositions,
+    IThingsContainer
 } from "./IBattleMovr";
 
 /**
@@ -14,69 +14,57 @@ export class BattleMovr implements IBattleMovr {
     /**
      * The IGameStartr providing Thing and actor information.
      */
-    private GameStarter: IGameStartr;
+    protected GameStarter: IGameStartr;
 
     /**
-     * 
+     * Names of known MenuGraphr menus.
      */
-    private things: IThingsContainer;
+    protected menuNames: IMenuNames;
 
     /**
-     * The type of Thing to create and use as the background.
+     * Option menus the player may select during battle.
+     */
+    protected battleOptions: IBattleOption[];
+
+    /**
+     * Default settings for running battles.
+     */
+    protected defaults: IBattleInfoDefaults;
+
+    /**
+     * Default positions of in-battle Things.
+     */
+    protected positions: IPositions;
+
+    /**
+     * Current settings for a running battle.
+     */
+    protected battleInfo: IBattleInfo;
+
+    /**
+     * All in-battle Things.
+     */
+    protected things: IThingsContainer;
+
+    /**
+     * The type of Thing to create and use as a background.
      */
     private backgroundType: string;
 
     /**
-     * The created Thing used as the background.
+     * The created Thing used as a background.
      */
-    private backgroundThing: IThing;
+    private backgroundThing: GameStartr.IThing;
 
     /**
-     * 
-     */
-    private battleOptions: IBattleOptions;
-
-    /**
-     * 
-     */
-    private menuNames: IMenuNames;
-
-    /**
-     * 
-     */
-    private battleInfo: IBattleInfo;
-
-    /**
-     * 
+     * Whether a battle is currently happening.
      */
     private inBattle: boolean;
 
     /**
+     * Initializes a new instance of the BattleMovr class.
      * 
-     */
-    private defaults: IBattleInfoDefaults;
-
-    /**
-     * 
-     */
-    private positions: {
-        [i: string]: IPosition;
-    };
-
-    /**
-     * 
-     */
-    private openItemsMenuCallback: (settings: any) => void;
-
-    /**
-     * Callback to open the actors menu.
-     * 
-     * 
-     */
-    private openActorsMenuCallback: (settings: any) => void;
-
-    /**
-     * @param {IBattleMovrSettings} settings
+     * @param settings   Settings to be used for initialization.
      */
     public constructor(settings: IBattleMovrSettings) {
         if (typeof settings.GameStarter === "undefined") {
@@ -92,8 +80,6 @@ export class BattleMovr implements IBattleMovr {
         this.GameStarter = settings.GameStarter;
         this.battleOptions = settings.battleOptions;
         this.menuNames = settings.menuNames;
-        this.openItemsMenuCallback = settings.openItemsMenuCallback;
-        this.openActorsMenuCallback = settings.openActorsMenuCallback;
 
         this.defaults = settings.defaults || {};
         this.backgroundType = settings.backgroundType;
@@ -104,72 +90,75 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
-     * 
+     * @returns The IGameStartr providing Thing and actor information.
      */
     public getGameStarter(): IGameStartr {
         return this.GameStarter;
     }
 
     /**
-     * 
-     */
-    public getDefaults(): IBattleInfoDefaults {
-        return this.defaults;
-    }
-
-    /**
-     * 
-     */
-    public getThings(): IThingsContainer {
-        return this.things;
-    }
-
-    /**
-     * 
-     */
-    public getThing(name: string): IThing {
-        return this.things[name];
-    }
-
-    /**
-     * 
+     * @returns Names of known MenuGraphr menus.
      */
     public getMenuNames(): IMenuNames {
         return this.menuNames;
     }
 
     /**
-     * 
+     * @returns Default settings for running battles.
+     */
+    public getDefaults(): IBattleInfoDefaults {
+        return this.defaults;
+    }
+
+    /**
+     * @returns All in-battle Things.
+     */
+    public getThings(): IThingsContainer {
+        return this.things;
+    }
+
+    /**
+     * @param name   A name of an in-battle Thing.
+     * @returns The named in-battle Thing.
+     */
+    public getThing(name: string): GameStartr.IThing {
+        return this.things[name];
+    }
+
+    /**
+     * @returns Current settings for a running battle.
      */
     public getBattleInfo(): IBattleInfo {
         return this.battleInfo;
     }
 
     /**
-     * 
-     */
-    public getBackgroundType(): string {
-        return this.backgroundType;
-    }
-
-    /**
-     * 
-     */
-    public getBackgroundThing(): IThing {
-        return this.backgroundThing;
-    }
-
-    /**
-     * 
+     * @returns Whether a battle is currently happening.
      */
     public getInBattle(): boolean {
         return this.inBattle;
     }
 
     /**
-     * 
+     * @returns The type of Thing to create and use as a background.
      */
-    public startBattle(settings: IBattleSettings): void {
+    public getBackgroundType(): string {
+        return this.backgroundType;
+    }
+
+    /**
+     * @returns The created Thing used as a background.
+     */
+    public getBackgroundThing(): GameStartr.IThing {
+        return this.backgroundThing;
+    }
+
+    /**
+     * Starts a battle.
+     * 
+     * @param settings   Settings for running the battle.
+     */
+    public startBattle(settings: IBattleInfo): void {
         if (this.inBattle) {
             return;
         }
@@ -181,7 +170,7 @@ export class BattleMovr implements IBattleMovr {
         // don't cause an infinite loop proliferating
         for (const i in settings) {
             if (settings.hasOwnProperty(i)) {
-                this.battleInfo.battlers[i] = (settings as any)[i];
+                this.battleInfo[i] = (settings as any)[i];
             }
         }
 
@@ -190,16 +179,16 @@ export class BattleMovr implements IBattleMovr {
 
         this.createBackground();
 
-        this.GameStarter.MenuGrapher.createMenu("Battle", {
+        this.GameStarter.MenuGrapher.createMenu(this.menuNames.battle, {
             ignoreB: true
         });
-        this.GameStarter.MenuGrapher.createMenu("BattleDisplayInitial");
+        this.GameStarter.MenuGrapher.createMenu(this.menuNames.battleDisplayInitial);
 
-        this.things.menu = this.GameStarter.MenuGrapher.getMenu("BattleDisplayInitial");
+        this.things.menu = this.GameStarter.MenuGrapher.getMenu(this.menuNames.battleDisplayInitial);
         this.setThing("opponent", this.battleInfo.battlers.opponent.sprite);
         this.setThing("player", this.battleInfo.battlers.player.sprite);
 
-        this.GameStarter.ScenePlayer.startCutscene("Battle", {
+        this.GameStarter.ScenePlayer.startCutscene(this.menuNames.battle, {
             things: this.things,
             battleInfo: this.battleInfo,
             nextCutscene: settings.nextCutscene,
@@ -208,7 +197,10 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
+     * Closes any current battle.
      * 
+     * @param callback   A callback to run after the battle is closed.
+     * @remarks The callback will run after deleting menus but before the next cutscene.
      */
     public closeBattle(callback?: () => void): void {
         if (!this.inBattle) {
@@ -225,9 +217,9 @@ export class BattleMovr implements IBattleMovr {
 
         this.deleteBackground();
 
-        this.GameStarter.MenuGrapher.deleteMenu("Battle");
-        this.GameStarter.MenuGrapher.deleteMenu("GeneralText");
-        this.GameStarter.MenuGrapher.deleteMenu("BattleOptions");
+        this.GameStarter.MenuGrapher.deleteMenu(this.menuNames.battle);
+        this.GameStarter.MenuGrapher.deleteMenu(this.menuNames.generalText);
+        this.GameStarter.MenuGrapher.deleteMenu(this.menuNames.player);
 
         if (callback) {
             callback();
@@ -247,33 +239,32 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
-     * 
+     * Shows the player menu.
      */
     public showPlayerMenu(): void {
-        this.GameStarter.MenuGrapher.createMenu("BattleOptions", {
+        this.GameStarter.MenuGrapher.createMenu(this.menuNames.player, {
             ignoreB: true
         });
 
-        this.GameStarter.MenuGrapher.addMenuList("BattleOptions", {
-            options: Object.keys(this.battleOptions)
-                .map((text: string): any => {
-                    return {
-                        text,
-                        callback: this.battleOptions[text].callback
-                    };
-                })
+        this.GameStarter.MenuGrapher.addMenuList(this.menuNames.player, {
+            options: this.battleOptions
         });
 
-        this.GameStarter.MenuGrapher.setActiveMenu("BattleOptions");
+        this.GameStarter.MenuGrapher.setActiveMenu(this.menuNames.player);
     }
 
     /**
+     * Creates and displays an in-battle Thing.
      * 
+     * @param name   The storage name of the Thing.
+     * @param title   The Thing's in-game type.
+     * @param settings   Any additional settings to create the Thing.
+     * @returns The created Thing.
      */
-    public setThing(name: string, title: string, settings?: any): IThing {
+    public setThing(name: string, title: string, settings?: any): GameStartr.IThing {
         const position: IPosition = this.positions[name] || {};
-        const battleMenu: MenuGraphr.IMenu = this.GameStarter.MenuGrapher.getMenu("Battles");
-        let thing: IThing = this.things[name];
+        const battleMenu: MenuGraphr.IMenu = this.GameStarter.MenuGrapher.getMenu(this.menuNames.battle);
+        let thing: GameStartr.IThing = this.things[name];
 
         if (thing) {
             this.GameStarter.physics.killNormal(thing);
@@ -292,7 +283,9 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
+     * Starts a round of battle with a player's move.
      * 
+     * @param choisePlayer   The player's move choice.
      */
     public playMove(choicePlayer: string): void {
         const choiceOpponent: string = this.GameStarter.MathDecider.compute(
@@ -323,9 +316,11 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
+     * Switches a battler's actor.
      * 
+     * @param battlerName   The name of the battler.
      */
-    public switchActor(battlerName: string, i: number): void {
+    public switchActor(battlerName: "player" | "opponent", i: number): void {
         const battler: IBattler = this.battleInfo.battlers[battlerName];
 
         if (battler.selectedIndex === i) {
@@ -340,13 +335,11 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
+     * Creates the battle background.
      * 
+     * @param type   A type of background, if not the default.
      */
-    public createBackground(): void {
-        if (!this.backgroundType) {
-            return;
-        }
-
+    public createBackground(type: string = this.backgroundType): void {
         this.backgroundThing = this.GameStarter.things.add(this.backgroundType);
 
         this.GameStarter.physics.setWidth(
@@ -364,7 +357,7 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
-     * 
+     * Deletes the battle background.
      */
     public deleteBackground(): void {
         if (this.backgroundThing) {
