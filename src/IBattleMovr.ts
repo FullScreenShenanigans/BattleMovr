@@ -253,7 +253,7 @@ export interface IBattleMovrSettings {
     /**
      * The IGameStartr providing Thing and actor information.
      */
-    GameStarter: IGameStartr;
+    gameStarter: IGameStartr;
 
     /**
      * Names of known MenuGraphr menus.
@@ -286,9 +286,9 @@ export interface IBattleMovrSettings {
  */
 export interface IBattleMovr {
     /**
-     * @returns The IGameStartr providing Thing and actor information.
+     * The IGameStartr providing Thing and actor information.
      */
-    getGameStarter(): IGameStartr;
+    readonly gameStarter: IGameStartr;
 
     /**
      * @returns Names of known MenuGraphr menus.
