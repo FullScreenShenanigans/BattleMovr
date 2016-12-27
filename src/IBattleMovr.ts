@@ -3,7 +3,6 @@ import { IThing } from "gamestartr/lib/IGameStartr";
 import { IMenuDialogRaw, IMenuGraphr } from "menugraphr/lib/IMenuGraphr";
 import { ICutsceneSettings } from "sceneplayr/lib/IScenePlayr";
 
-
 /**
  * Description of a menu available during battle.
  */
