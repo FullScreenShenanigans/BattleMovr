@@ -1,10 +1,10 @@
+import { GameStartr } from "gamestartr/lib/GameStartr";
 import { IThing } from "gamestartr/lib/IGameStartr";
-import { IMenu } from "menugraphr/lib/IMenuGraphr";
+import { IMenu, IMenuGraphr } from "menugraphr/lib/IMenuGraphr";
 
 import {
     IBattleInfo, IBattleInfoDefaults, IBattleMovr, IBattleMovrSettings,
-    IBattleOption, IBattler, IGameStartr, IMenuNames, IPosition, IPositions,
-    IThingsContainer
+    IBattleOption, IBattler, IMenuNames, IPosition, IPositions, IThingsContainer
 } from "./IBattleMovr";
 
 /**
@@ -14,7 +14,12 @@ export class BattleMovr implements IBattleMovr {
     /**
      * The IGameStartr providing Thing and actor information.
      */
-    public readonly gameStarter: IGameStartr;
+    public readonly gameStarter: GameStartr;
+
+    /**
+     * In-game menu and dialog creation and management for GameStartr.
+     */
+    public readonly menuGrapher: IMenuGraphr;
 
     /**
      * Names of known MenuGraphr menus.
@@ -172,12 +177,12 @@ export class BattleMovr implements IBattleMovr {
 
         this.createBackground();
 
-        this.gameStarter.MenuGrapher.createMenu(this.menuNames.battle, {
+        this.menuGrapher.createMenu(this.menuNames.battle, {
             ignoreB: true
         });
-        this.gameStarter.MenuGrapher.createMenu(this.menuNames.battleDisplayInitial);
+        this.menuGrapher.createMenu(this.menuNames.battleDisplayInitial);
 
-        this.things.menu = this.gameStarter.MenuGrapher.getMenu(this.menuNames.battleDisplayInitial);
+        this.things.menu = this.menuGrapher.getMenu(this.menuNames.battleDisplayInitial);
         this.setThing("opponent", this.battleInfo.battlers.opponent!.sprite);
         this.setThing("player", this.battleInfo.battlers.player!.sprite);
 
@@ -210,9 +215,9 @@ export class BattleMovr implements IBattleMovr {
 
         this.deleteBackground();
 
-        this.gameStarter.MenuGrapher.deleteMenu(this.menuNames.battle);
-        this.gameStarter.MenuGrapher.deleteMenu(this.menuNames.generalText);
-        this.gameStarter.MenuGrapher.deleteMenu(this.menuNames.player);
+        this.menuGrapher.deleteMenu(this.menuNames.battle);
+        this.menuGrapher.deleteMenu(this.menuNames.generalText);
+        this.menuGrapher.deleteMenu(this.menuNames.player);
 
         if (callback) {
             callback();
@@ -235,15 +240,15 @@ export class BattleMovr implements IBattleMovr {
      * Shows the player menu.
      */
     public showPlayerMenu(): void {
-        this.gameStarter.MenuGrapher.createMenu(this.menuNames.player, {
+        this.menuGrapher.createMenu(this.menuNames.player, {
             ignoreB: true
         });
 
-        this.gameStarter.MenuGrapher.addMenuList(this.menuNames.player, {
+        this.menuGrapher.addMenuList(this.menuNames.player, {
             options: this.battleOptions
         });
 
-        this.gameStarter.MenuGrapher.setActiveMenu(this.menuNames.player);
+        this.menuGrapher.setActiveMenu(this.menuNames.player);
     }
 
     /**
@@ -256,7 +261,7 @@ export class BattleMovr implements IBattleMovr {
      */
     public setThing(name: string, title: string, settings?: any): IThing {
         const position: IPosition = this.positions[name] || {};
-        const battleMenu: IMenu = this.gameStarter.MenuGrapher.getMenu(this.menuNames.battle);
+        const battleMenu: IMenu = this.menuGrapher.getMenu(this.menuNames.battle);
         let thing: IThing | undefined = this.things[name];
 
         if (thing) {
@@ -278,21 +283,11 @@ export class BattleMovr implements IBattleMovr {
     /**
      * Starts a round of battle with a player's move.
      * 
-     * @param choisePlayer   The player's move choice.
+     * @param choicePlayer   The player's move choice.
+     * @param choiceOpponent   The opponent's move choice.
+     * @parma playerMovesFirst   Whether the player should move first.
      */
-    public playMove(choicePlayer: string): void {
-        const choiceOpponent: string = this.gameStarter.mathDecider.compute(
-            "opponentMove",
-            this.battleInfo.battlers.player,
-            this.battleInfo.battlers.opponent);
-
-        const playerMovesFirst: boolean = this.gameStarter.mathDecider.compute(
-            "playerMovesFirst",
-            this.battleInfo.battlers.player,
-            choicePlayer,
-            this.battleInfo.battlers.opponent,
-            choiceOpponent);
-
+    public playMove(choicePlayer: string, choiceOpponent: string, playerMovesFirst: boolean): void {
         if (playerMovesFirst) {
             this.gameStarter.scenePlayer.playRoutine("MovePlayer", {
                 extRoutine: "MoveOpponent",

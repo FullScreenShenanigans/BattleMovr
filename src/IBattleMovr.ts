@@ -3,15 +3,6 @@ import { IThing } from "gamestartr/lib/IGameStartr";
 import { IMenuDialogRaw, IMenuGraphr } from "menugraphr/lib/IMenuGraphr";
 import { ICutsceneSettings } from "sceneplayr/lib/IScenePlayr";
 
-/**
- * Extended IGameStartr with menus.
- */
-export interface IGameStartr extends GameStartr {
-    /**
-     * In-game menu and dialog creation and management for GameStartr.
-     */
-    MenuGrapher: IMenuGraphr;
-}
 
 /**
  * Description of a menu available during battle.
@@ -253,7 +244,12 @@ export interface IBattleMovrSettings {
     /**
      * The IGameStartr providing Thing and actor information.
      */
-    gameStarter: IGameStartr;
+    gameStarter: GameStartr;
+
+    /**
+     * In-game menu and dialog creation and management for GameStartr.
+     */
+    MenuGrapher: IMenuGraphr;
 
     /**
      * Names of known MenuGraphr menus.
@@ -288,7 +284,12 @@ export interface IBattleMovr {
     /**
      * The IGameStartr providing Thing and actor information.
      */
-    readonly gameStarter: IGameStartr;
+    readonly gameStarter: GameStartr;
+
+    /**
+     * In-game menu and dialog creation and management for GameStartr.
+     */
+    readonly menuGrapher: IMenuGraphr;
 
     /**
      * @returns Names of known MenuGraphr menus.
@@ -364,9 +365,11 @@ export interface IBattleMovr {
     /**
      * Starts a round of battle with a player's move.
      * 
-     * @param choisePlayer   The player's move choice.
+     * @param choicePlayer   The player's move choice.
+     * @param choiceOpponent   The opponent's move choice.
+     * @parma playerMovesFirst   Whether the player should move first.
      */
-    playMove(choicePlayer: string): void;
+    playMove(choicePlayer: string, choiceOpponent: string, playerMovesFirst: boolean): void;
 
     /**
      * Switches a battler's actor.
