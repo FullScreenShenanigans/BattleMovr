@@ -1,18 +1,21 @@
 import { IActor } from "./Actors";
+import { ISelector } from "./Selectors";
 
 /**
- * Opposing teams in a battle.
+ * Data storage for something each team has.
+ * 
+ * @type T   Data stored for each team.
  */
-export interface IBattleTeams {
+export interface IUnderEachTeam<T> {
     /**
-     * Opponent team.
+     * Opponent value for the data.
      */
-    opponent: ITeam;
+    opponent: T;
 
     /**
-     * Controlling player's team.
+     * Player value for the data.
      */
-    player: ITeam;
+    player: T;
 }
 
 /**
@@ -28,6 +31,11 @@ export interface ITeam {
      * Character appearing to direct the actors.
      */
     leader?: ITeamLeader;
+
+    /**
+     * How the team chooses their actions.
+     */
+    selector: ISelector;
 }
 
 /**
