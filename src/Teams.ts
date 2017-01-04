@@ -2,6 +2,21 @@ import { IActor } from "./Actors";
 import { ISelector } from "./Selectors";
 
 /**
+ * Descriptor for a team.
+ */
+export enum Team {
+    /**
+     * The opponent's team.
+     */
+    opponent,
+
+    /**
+     * The player's team.
+     */
+    player
+}
+
+/**
  * Data storage for something each team has.
  * 
  * @type T   Data stored for each team.
@@ -16,6 +31,8 @@ export interface IUnderEachTeam<T> {
      * Player value for the data.
      */
     player: T;
+
+    [i: string /* "opponent" | "player" */]: T;
 }
 
 /**

@@ -28,6 +28,11 @@ export interface IActor {
     statistics: IStatistics;
 
     /**
+     * Any current status effect.
+     */
+    status?: string;
+
+    /**
      * Sprite title for the actor's Thing.
      */
     title: string[];
