@@ -10,7 +10,7 @@ export class BattleMovr implements IBattleMovr {
     /**
      * Animations for various battle activities.
      */
-    private animations: IAnimations;
+    private readonly animations: IAnimations;
 
     /**
      * Battle info for the current battle, if one is happening.
@@ -41,8 +41,9 @@ export class BattleMovr implements IBattleMovr {
      * Starts a new battle.
      * 
      * @param options   Options to start the battle.
+     * @returns Battle info for the new battle.
      */
-    public startBattle(options: IBattleOptions): void {
+    public startBattle(options: IBattleOptions): IBattleInfo {
         if (this.battleInfo) {
             throw new Error("A battle is already happening.");
         }
@@ -55,10 +56,17 @@ export class BattleMovr implements IBattleMovr {
                 player: this.createTeamFromInfo(options.teams.player)
             }
         };
+
+        // Do something for the battle here?
+
+        return this.battleInfo;
     }
 
     /**
+     * Creates a battle team from starting info.
      * 
+     * @param team   Starting info on a team.
+     * @returns A battle team for the starting info.
      */
     private createTeamFromInfo(team: ITeam): IBattleTeam {
         return {

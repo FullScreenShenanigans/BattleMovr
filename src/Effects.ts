@@ -1,5 +1,8 @@
 import { Team } from "./Teams";
 
+/**
+ * Effect description for a battle move.
+ */
 export type IMoveEffect = IDamageEffect | IStatisticEffect | IStatusEffect | ISwitchEffect;
 
 /**

@@ -52,7 +52,7 @@ export interface ITeam {
     /**
      * How the team chooses their actions.
      */
-    selector: ISelector;
+    selector: string;
 }
 
 /**

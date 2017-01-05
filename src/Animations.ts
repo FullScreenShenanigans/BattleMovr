@@ -54,6 +54,11 @@ export interface IAnimations {
      * Animation for an actor getting knocked out.
      */
     onKnockout: IOnKnockout;
+
+    /**
+     * Animation for a battle starting.
+     */
+    onStart: IOnStart;
 }
 
 /**
@@ -86,7 +91,7 @@ export interface IOnActions {
  * 
  * @param team   Which team is performing the action.
  * @param action   Action being performed.
- * @param onComplete   Animation for when the action is done.
+ * @param onComplete   Callback for when the action is done.
  * @type TAction   Type of action being performed.
  */
 export interface IOnAction<TAction extends IAction> {
@@ -107,7 +112,7 @@ export interface IOnBattleComplete {
  * 
  * @param team   Which team's actor is being affected.
  * @param health   New value for the actor's health.
- * @param onComplete   Animation for when this is done.
+ * @param onComplete   Callback for when this is done.
  */
 export interface IOnHealthChange {
     (team: Team, health: number, onComplete: () => void): void;
@@ -117,8 +122,17 @@ export interface IOnHealthChange {
  * Animation for when an actor gets knocked out.
  * 
  * @param team   Which team's actor is knocked out.
- * @param onComplete   Animation for when this is done.
+ * @param onComplete   Callback for when this is done.
  */
 export interface IOnKnockout {
     (team: Team, onComplete: () => void): void;
+}
+
+/**
+ * Animation for a battle starting.
+ * 
+ * @param onComplete   Callback for when this is done.
+ */
+export interface IOnStart {
+    (onComplete: () => void): void;
 }
