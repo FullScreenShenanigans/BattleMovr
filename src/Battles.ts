@@ -1,17 +1,11 @@
 import { IAction } from "./Actions";
 import { IActor } from "./Actors";
-import { IOnBattleComplete } from "./Animations";
 import { ITeam, IUnderEachTeam, Team } from "./Teams";
 
 /**
  * Options to start a battle.
  */
 export interface IBattleOptions {
-    /**
-     * Callback for when the battle is complete.
-     */
-    onComplete: IOnBattleComplete;
-
     /**
      * Opposing teams in the battle.
      */

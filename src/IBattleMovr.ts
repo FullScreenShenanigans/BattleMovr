@@ -1,6 +1,7 @@
 import { IAnimations } from "./Animations";
 import { IBattleInfo, IBattleOptions } from "./Battles";
-import { ISelectors } from "./Selectors";
+import { ISelector } from "./Selectors";
+import { IUnderEachTeam } from "./Teams";
 
 /**
  * Settings to initialize a new IBattleMovr.
@@ -14,7 +15,7 @@ export interface IBattleMovrSettings {
     /**
      * Available selectors, keyed by name.
      */
-    selectors: ISelectors;
+    selectors: IUnderEachTeam<ISelector>;
 }
 
 /**

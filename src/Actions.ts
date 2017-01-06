@@ -1,3 +1,5 @@
+import { IActor } from "./Actors";
+
 /**
  * Titles of actions that a team may take in battle.
  */
@@ -25,7 +27,7 @@ export interface IItemAction {
     /**
      * Descriptor of the item being used.
      */
-    item: string[];
+    item: string;
 
     /**
      * What type of action this is.
@@ -40,7 +42,7 @@ export interface IMoveAction {
     /**
      * Descriptor of the move being used.
      */
-    move: string[];
+    move: string;
 
     /**
      * What type of action this is.
@@ -53,9 +55,9 @@ export interface IMoveAction {
  */
 export interface ISwitchAction {
     /**
-     * Index of the actor to bring out.
+     * Another actor to bring out.
      */
-    newIndex: number;
+    newActor: IActor;
 
     /**
      * What type of action this is.

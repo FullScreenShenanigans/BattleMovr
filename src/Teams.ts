@@ -1,5 +1,4 @@
 import { IActor } from "./Actors";
-import { ISelector } from "./Selectors";
 
 /**
  * Descriptor for a team.
@@ -31,8 +30,6 @@ export interface IUnderEachTeam<T> {
      * Player value for the data.
      */
     player: T;
-
-    [i: string /* "opponent" | "player" */]: T;
 }
 
 /**

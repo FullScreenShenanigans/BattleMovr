@@ -48,18 +48,14 @@ export class BattleMovr implements IBattleMovr {
             throw new Error("A battle is already happening.");
         }
 
-        this.battleInfo = {
+        return this.battleInfo = {
+            ...options,
             choices: {},
-            onComplete: options.onComplete,
             teams: {
                 opponent: this.createTeamFromInfo(options.teams.opponent),
                 player: this.createTeamFromInfo(options.teams.player)
             }
         };
-
-        // Do something for the battle here?
-
-        return this.battleInfo;
     }
 
     /**
