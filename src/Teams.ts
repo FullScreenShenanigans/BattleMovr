@@ -1,4 +1,5 @@
 import { IActor } from "./Actors";
+import { ISelector } from "./Selectors";
 
 /**
  * Descriptor for a team.
@@ -33,9 +34,9 @@ export interface IUnderEachTeam<T> {
 }
 
 /**
- * A team of actors to be engaged in battle.
+ * Common attributes for teams of actors.
  */
-export interface ITeam {
+export interface ITeamBase {
     /**
      * Actors that will fight.
      */
@@ -45,11 +46,26 @@ export interface ITeam {
      * Character appearing to direct the actors.
      */
     leader?: ITeamLeader;
+}
 
+/**
+ * External descriptor of a team of actors to be engaged in battle.
+ */
+export interface ITeamDescriptor {
     /**
      * How the team chooses their actions.
      */
     selector: string;
+}
+
+/**
+ * A team of actors engaged in battle.
+ */
+export interface ITeam extends ITeamBase {
+    /**
+     * How the team chooses their actions.
+     */
+    selector: ISelector;
 }
 
 /**

@@ -1,7 +1,8 @@
+import { IAction } from "./Actions";
 import { IAnimations } from "./Animations";
 import { IBattleInfo, IBattleOptions, IBattleTeam } from "./Battles";
 import { IBattleMovr, IBattleMovrSettings } from "./IBattleMovr";
-import { ITeam } from "./Teams";
+import { ITeam, IUnderEachTeam } from "./Teams";
 
 /**
  * Drives RPG-like battles between two teams of actors.
@@ -48,7 +49,7 @@ export class BattleMovr implements IBattleMovr {
             throw new Error("A battle is already happening.");
         }
 
-        return this.battleInfo = {
+        this.battleInfo = {
             ...options,
             choices: {},
             teams: {
@@ -56,6 +57,50 @@ export class BattleMovr implements IBattleMovr {
                 player: this.createTeamFromInfo(options.teams.player)
             }
         };
+
+        this.animations.onStart((): void => this.waitForActions(this.battleInfo!));
+
+        return this.battleInfo;
+    }
+
+    /**
+     * Waits for actions from each team's selectors.
+     * 
+     * @param battleInfo   State for the ongoing battle.
+     */
+    private waitForActions(battleInfo: IBattleInfo): void {
+        let completed: number = 0;
+        let actions: Partial<IUnderEachTeam<IAction>> = {};
+
+        const onChoice: Function = (): void => {
+            completed += 1;
+            if (completed === 2) {
+                this.executeActions(actions as IUnderEachTeam<IAction>);
+            }
+        };
+
+        battleInfo.teams.opponent.selector.nextAction(
+            battleInfo,
+            (action: IAction): void => {
+                actions.opponent = action;
+                onChoice();
+            });
+
+        battleInfo.teams.player.selector.nextAction(
+            battleInfo,
+            (action: IAction): void => {
+                actions.opponent = action;
+                onChoice();
+            });
+    }
+
+    /**
+     * Executes each team's chosen actions.
+     * 
+     * @param actions   Chosen actions by the teams.
+     */
+    private executeActions(actions: IUnderEachTeam<IAction>): void {
+        console.log("Executing", actions);
     }
 
     /**
