@@ -36,17 +36,13 @@ export class Introductions extends Animator {
             this.animations.player.introduction(next);
         });
 
-        if (this.battleInfo.teams.opponent.leader) {
-            queue.add((next: () => void): void => {
-                this.animations.opponent.switching.enter(next);
-            });
-        }
+        queue.add((next: () => void): void => {
+            this.animations.opponent.switching.enter(next);
+        });
 
-        if (this.battleInfo.teams.player.leader) {
-            queue.add((next: () => void): void => {
-                this.animations.player.switching.enter(next);
-            });
-        }
+        queue.add((next: () => void): void => {
+            this.animations.player.switching.enter(next);
+        });
 
         queue.run(onComplete);
     }
