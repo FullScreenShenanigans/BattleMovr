@@ -40,11 +40,4 @@ export abstract class Animator {
         this.animations = settings.animations;
         this.battleInfo = settings.battleInfo;
     }
-
-    /**
-     * Runs the animations.
-     * 
-     * @param onComplete   Handler for when the animations are done.
-     */
-    public abstract run(onComplete: () => void): void;
 }

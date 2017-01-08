@@ -3,6 +3,7 @@ import { IBattleInfo } from "../Battles";
 import { IUnderEachTeam } from "../Teams";
 import { Animator } from "./Animator";
 import { Introductions } from "./Introductions";
+import { Queue } from "./Queue";
 
 /**
  * Root animator for a battle.
@@ -17,11 +18,17 @@ export class Main extends Animator {
      * Runs the animations.
      */
     public run(): void {
-        this.animations.onStart((): void => {
-            this.introductions.run((): void => {
-                this.waitForActions(this.battleInfo);
-            });
+        const queue: Queue = new Queue();
+
+        queue.add((next: () => void): void => {
+            this.animations.start(next);
         });
+
+        queue.add((next: () => void): void => {
+            this.introductions.run(next);
+        });
+
+        queue.run((): void => this.waitForActions(this.battleInfo));
     }
 
     /**
@@ -30,8 +37,8 @@ export class Main extends Animator {
      * @param battleInfo   State for the ongoing battle.
      */
     private waitForActions(battleInfo: IBattleInfo): void {
+        const actions: Partial<IUnderEachTeam<IAction>> = {};
         let completed: number = 0;
-        let actions: Partial<IUnderEachTeam<IAction>> = {};
 
         const onChoice: Function = (): void => {
             completed += 1;

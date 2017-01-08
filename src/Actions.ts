@@ -1,6 +1,42 @@
 import { IActor } from "./Actors";
 
 /**
+ * Animation for when a team performs a move action.
+ * 
+ * @param action   Action being performed.
+ * @param onComplete   Callback for when the action is done.
+ * @type TAction   Type of action being performed.
+ */
+export interface IOnAction<TAction extends IAction> {
+    (action: TAction, onComplete: () => void): void;
+}
+
+/**
+ * Action animations, keyed by their type codes.
+ */
+export interface IOnActions {
+    /**
+     * Action for a team attempting to leave the battle.
+     */
+    flee: IOnAction<IFleeAction>;
+
+    /**
+     * Action for a team using an item.
+     */
+    item: IOnAction<IItemAction>;
+
+    /**
+     * Action for a team's selected actor using a move.
+     */
+    move: IOnAction<IMoveAction>;
+
+    /**
+     * Action for a team switching actors.
+     */
+    switch: IOnAction<ISwitchAction>;
+}
+
+/**
  * Titles of actions that a team may take in battle.
  */
 export type IActionType = "flee" | "item" | "move" | "switch";
