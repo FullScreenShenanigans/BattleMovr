@@ -22,3 +22,17 @@ export interface ISelector {
      */
     nextAction(battleInfo: IBattleInfo, onChoice: IOnChoice): void;
 }
+
+/**
+ * Creates selectors of a single type.
+ */
+export interface ISelectorFactory {
+    (): ISelector;
+}
+
+/**
+ * Selector factories keyed by type name.
+ */
+export interface ISelectorFactories {
+    [i: string]: ISelectorFactory;
+}

@@ -1,5 +1,5 @@
 import { IAction, IFleeAction, IItemAction, IMoveAction, ISwitchAction } from "./Actions";
-import { Team } from "./Teams";
+import { IUnderEachTeam, Team } from "./Teams";
 
 /**
  * Descriptors of why a battle may finish.
@@ -36,6 +36,11 @@ export enum BattleOutcome {
  */
 export interface IAnimations {
     /**
+     * Animations for teams introducting themselves.
+     */
+    introductions: IUnderEachTeam<IOnIntroduction>;
+
+    /**
      * Action animations, keyed by their type codes.
      */
     onActions: IOnActions;
@@ -59,6 +64,15 @@ export interface IAnimations {
      * Animation for a battle starting.
      */
     onStart: IOnStart;
+}
+
+/**
+ * Animation for a team introducing themselves.
+ * 
+ * @param onComplete   Callback for when the animation is done.
+ */
+export interface IOnIntroduction {
+    (onComplete: () => void): void;
 }
 
 /**

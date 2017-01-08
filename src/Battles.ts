@@ -1,6 +1,6 @@
 import { IAction } from "./Actions";
 import { IActor } from "./Actors";
-import { ITeam, IUnderEachTeam, Team } from "./Teams";
+import { ITeam, ITeamDescriptor, IUnderEachTeam, Team } from "./Teams";
 
 /**
  * Options to start a battle.
@@ -9,13 +9,13 @@ export interface IBattleOptions {
     /**
      * Opposing teams in the battle.
      */
-    teams: IUnderEachTeam<ITeam>;
+    teams: IUnderEachTeam<ITeamDescriptor>;
 }
 
 /**
  * State for an ongoing battle.
  */
-export interface IBattleInfo extends IBattleOptions {
+export interface IBattleInfo {
     /**
      * What each team has decided to do, if anything yet.
      */

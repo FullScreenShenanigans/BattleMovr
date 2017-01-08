@@ -51,7 +51,7 @@ export interface ITeamBase {
 /**
  * External descriptor of a team of actors to be engaged in battle.
  */
-export interface ITeamDescriptor {
+export interface ITeamDescriptor extends ITeamBase {
     /**
      * How the team chooses their actions.
      */
@@ -80,5 +80,5 @@ export interface ITeamLeader {
     /**
      * Sprite title for the leader's Thing.
      */
-    title: string;
+    title: string[];
 }

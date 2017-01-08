@@ -1,8 +1,9 @@
-import { IAction } from "./Actions";
 import { IAnimations } from "./Animations";
+import { Main as MainAnimator } from "./animators/Main";
 import { IBattleInfo, IBattleOptions, IBattleTeam } from "./Battles";
 import { IBattleMovr, IBattleMovrSettings } from "./IBattleMovr";
-import { ITeam, IUnderEachTeam } from "./Teams";
+import { ISelectorFactories } from "./Selectors";
+import { ITeamBase, ITeamDescriptor } from "./Teams";
 
 /**
  * Drives RPG-like battles between two teams of actors.
@@ -12,6 +13,16 @@ export class BattleMovr implements IBattleMovr {
      * Animations for various battle activities.
      */
     private readonly animations: IAnimations;
+
+    /**
+     * Selector factories keyed by type name.
+     */
+    private readonly selectorFactories: ISelectorFactories = {};
+
+    /**
+     * Animator for the current battle, if one is happening.
+     */
+    private animator?: MainAnimator;
 
     /**
      * Battle info for the current battle, if one is happening.
@@ -25,6 +36,7 @@ export class BattleMovr implements IBattleMovr {
      */
     public constructor(settings: IBattleMovrSettings) {
         this.animations = settings.animations;
+        this.selectorFactories = settings.selectorFactories;
     }
 
     /**
@@ -58,49 +70,14 @@ export class BattleMovr implements IBattleMovr {
             }
         };
 
-        this.animations.onStart((): void => this.waitForActions(this.battleInfo!));
+        this.animator = new MainAnimator({
+            animations: this.animations,
+            battleInfo: this.battleInfo
+        });
+
+        this.animator.run();
 
         return this.battleInfo;
-    }
-
-    /**
-     * Waits for actions from each team's selectors.
-     * 
-     * @param battleInfo   State for the ongoing battle.
-     */
-    private waitForActions(battleInfo: IBattleInfo): void {
-        let completed: number = 0;
-        let actions: Partial<IUnderEachTeam<IAction>> = {};
-
-        const onChoice: Function = (): void => {
-            completed += 1;
-            if (completed === 2) {
-                this.executeActions(actions as IUnderEachTeam<IAction>);
-            }
-        };
-
-        battleInfo.teams.opponent.selector.nextAction(
-            battleInfo,
-            (action: IAction): void => {
-                actions.opponent = action;
-                onChoice();
-            });
-
-        battleInfo.teams.player.selector.nextAction(
-            battleInfo,
-            (action: IAction): void => {
-                actions.opponent = action;
-                onChoice();
-            });
-    }
-
-    /**
-     * Executes each team's chosen actions.
-     * 
-     * @param actions   Chosen actions by the teams.
-     */
-    private executeActions(actions: IUnderEachTeam<IAction>): void {
-        console.log("Executing", actions);
     }
 
     /**
@@ -109,12 +86,17 @@ export class BattleMovr implements IBattleMovr {
      * @param team   Starting info on a team.
      * @returns A battle team for the starting info.
      */
-    private createTeamFromInfo(team: ITeam): IBattleTeam {
+    private createTeamFromInfo(team: ITeamDescriptor & ITeamBase): IBattleTeam {
+        if (!this.selectorFactories[team.selector]) {
+            throw new Error(`Unknown selector type: '${team.selector}.`);
+        }
+
         return {
             ...team,
             orderedActors: team.actors.slice(),
             selectedActor: team.actors[0],
-            selectedIndex: 0
+            selectedIndex: 0,
+            selector: this.selectorFactories[team.selector]()
         };
     }
 }
