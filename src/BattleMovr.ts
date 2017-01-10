@@ -1,4 +1,4 @@
-import { IAnimations } from "./Animations";
+import { BattleOutcome, IAnimations } from "./Animations";
 import { Main as MainAnimator } from "./animators/Main";
 import { IBattleInfo, IBattleOptions, IBattleTeam } from "./Battles";
 import { IBattleMovr, IBattleMovrSettings } from "./IBattleMovr";
@@ -86,6 +86,18 @@ export class BattleMovr implements IBattleMovr {
         this.animator.run();
 
         return this.battleInfo;
+    }
+
+    /**
+     * Stops the current battle.
+     * 
+     * @param outcome   Why the battle stopped.
+     */
+    public stopBattle(outcome: BattleOutcome): void {
+        this.animator = undefined;
+        this.battleInfo = undefined;
+
+        this.animations.complete(outcome);
     }
 
     /**

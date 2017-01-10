@@ -87,18 +87,38 @@ export interface ITeamLeader {
 }
 
 /**
+ * A team and actor for an action.
+ */
+export interface ITeamAndActor {
+    /**
+     * The team's selected actor.
+     */
+    actor: IActor;
+
+    /**
+     * The team.
+     */
+    team: Team;
+}
+
+/**
  * An action with the team that wants to execute it.
  */
-export interface ITeamAction {
+export interface ITeamAndAction {
     /**
      * Action chosen by the team.
      */
     action: IAction;
 
     /**
-     * Team that chose the action.
+     * Team and actor that chose the action.
      */
-    team: Team;
+    source: ITeamAndActor;
+
+    /**
+     * Team and actor being targeted.
+     */
+    target: ITeamAndActor;
 }
 
 /**
@@ -108,5 +128,5 @@ export interface ITeamAction {
  * @returns Team actions ordered for battle.
  */
 export interface IActionsOrderer {
-    (actions: IUnderEachTeam<IAction>): ITeamAction[];
+    (actions: IUnderEachTeam<IAction>): ITeamAndAction[];
 }
