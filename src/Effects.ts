@@ -1,4 +1,32 @@
-import { Team } from "./Teams";
+/**
+ * Which actor should be affected by a move's effect.
+ */
+export enum EffectTarget {
+    /**
+     * The attacking actor should be affected.
+     */
+    attacker,
+
+    /**
+     * The defending actor should be affected.
+     */
+    defender
+}
+
+/**
+ * Base description for a move.
+ */
+export interface IEffectBase {
+    /**
+     * Probability of the move occuring as a number in (0, 100], if not 100.
+     */
+    probability?: number;
+
+    /**
+     * Which actor should be affected by the move.
+     */
+    target: EffectTarget;
+}
 
 /**
  * Effect description for a battle move.
@@ -8,16 +36,11 @@ export type IMoveEffect = IDamageEffect | IStatisticEffect | IStatusEffect | ISw
 /**
  * Move effect that deals damage.
  */
-export interface IDamageEffect {
+export interface IDamageEffect extends IEffectBase {
     /**
      * How much damage should be dealt.
      */
     damage: number;
-
-    /**
-     * Team whose actor is being affected.
-     */
-    target: Team;
 
     /**
      * What type of effect this is.
@@ -28,7 +51,7 @@ export interface IDamageEffect {
 /**
  * Move effect that changes a statistic.
  */
-export interface IStatisticEffect {
+export interface IStatisticEffect extends IEffectBase {
     /**
      * How much the statistic should change.
      */
@@ -40,11 +63,6 @@ export interface IStatisticEffect {
     statistic: string;
 
     /**
-     * Team whose actor is being affected.
-     */
-    target: Team;
-
-    /**
      * What type of effect this is.
      */
     type: "statistic";
@@ -53,12 +71,7 @@ export interface IStatisticEffect {
 /**
  * Move effect that applies a status.
  */
-export interface IStatusEffect {
-    /**
-     * Team whose actor is being affected.
-     */
-    target: Team;
-
+export interface IStatusEffect extends IEffectBase {
     /**
      * Which status is being applied.
      */
@@ -73,12 +86,7 @@ export interface IStatusEffect {
 /**
  * Move effect that switches actors.
  */
-export interface ISwitchEffect {
-    /**
-     * Team whose actor is being affected.
-     */
-    target: Team;
-
+export interface ISwitchEffect extends IEffectBase {
     /**
      * Index of the actor replacing the current actor.
      */

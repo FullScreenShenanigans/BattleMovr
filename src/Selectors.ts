@@ -1,5 +1,6 @@
 import { IAction } from "./Actions";
 import { IBattleInfo } from "./Battles";
+import { Team } from "./Teams";
 
 /**
  * Callback for a selector choosing an action.
@@ -18,9 +19,10 @@ export interface ISelector {
      * Determines the next action to take.
      * 
      * @param battleInfo   State for an ongoing battle.
+     * @param team   Which team is selecting an action.
      * @param onChoice   Callback for when an action is chosen.
      */
-    nextAction(battleInfo: IBattleInfo, onChoice: IOnChoice): void;
+    nextAction(battleInfo: IBattleInfo, team: Team, onChoice: IOnChoice): void;
 }
 
 /**

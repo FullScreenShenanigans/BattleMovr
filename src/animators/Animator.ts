@@ -33,8 +33,7 @@ export abstract class Animator {
     /**
      * Initializes a new instance of the Animator class.
      * 
-     * @param animations   Animations for various battle activities.
-     * @param battleInfo   Battle info for the battle.
+     * @param settings   Settings to be used for initialization.
      */
     public constructor(settings: IAnimatorSettings | Animator) {
         this.animations = settings.animations;

@@ -1,3 +1,4 @@
+import { IAction } from "./Actions";
 import { IActor } from "./Actors";
 import { ISelector } from "./Selectors";
 
@@ -31,6 +32,8 @@ export interface IUnderEachTeam<T> {
      * Player value for the data.
      */
     player: T;
+
+    [i: string /* "opponent" | "player" */]: T;
 }
 
 /**
@@ -81,4 +84,29 @@ export interface ITeamLeader {
      * Sprite title for the leader's Thing.
      */
     title: string[];
+}
+
+/**
+ * An action with the team that wants to execute it.
+ */
+export interface ITeamAction {
+    /**
+     * Action chosen by the team.
+     */
+    action: IAction;
+
+    /**
+     * Team that chose the action.
+     */
+    team: Team;
+}
+
+/**
+ * Orders teams' chosen actions.
+ * 
+ * @param actions   Actions chosen by each team.
+ * @returns Team actions ordered for battle.
+ */
+export interface IActionsOrderer {
+    (actions: IUnderEachTeam<IAction>): ITeamAction[];
 }

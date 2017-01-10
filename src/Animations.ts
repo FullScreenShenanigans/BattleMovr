@@ -1,6 +1,5 @@
 import { IOnActions } from "./Actions";
 import { IOnIntroduction } from "./animators/Introductions";
-import { IUnderEachTeam } from "./Teams";
 
 /**
  * Descriptors of why a battle may finish.
@@ -60,11 +59,21 @@ export interface ITeamAnimations {
 /**
  * Animations for various battle activities.
  */
-export interface IAnimations extends IUnderEachTeam<ITeamAnimations> {
+export interface IAnimations {
     /**
      * Animation for when the battle is complete.
      */
     complete: IOnBattleComplete;
+
+    /**
+     * Opponent team animations.
+     */
+    opponent: ITeamAnimations;
+
+    /**
+     * Player team animations.
+     */
+    player: ITeamAnimations;
 
     /**
      * Animation for a battle starting.

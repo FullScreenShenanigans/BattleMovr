@@ -1,7 +1,7 @@
 import { IAction } from "../Actions";
-import { IBattleInfo } from "../Battles";
-import { IUnderEachTeam } from "../Teams";
-import { Animator } from "./Animator";
+import { IActionsOrderer, IUnderEachTeam, Team } from "../Teams";
+import { Actions } from "./Actions";
+import { Animator, IAnimatorSettings } from "./Animator";
 import { Introductions } from "./Introductions";
 import { Queue } from "./Queue";
 
@@ -10,12 +10,34 @@ import { Queue } from "./Queue";
  */
 export class Main extends Animator {
     /**
+     * Animator for teams' actions.
+     */
+    private readonly actions: Actions = new Actions(this);
+
+    /**
      * Animator for teams introducing themselves.
      */
     private readonly introductions: Introductions = new Introductions(this);
 
     /**
-     * Runs the animations.
+     * Orders teams' chosen actions.
+     */
+    private readonly actionsOrderer: IActionsOrderer;
+
+    /**
+     * Initializes a new instance of the Animator class.
+     * 
+     * @param settings   Settings to be used for initialization.
+     * @param actionsOrderer   Battle info for the battle.
+     */
+    public constructor(settings: IAnimatorSettings | Animator, actionsOrderer: IActionsOrderer) {
+        super(settings);
+
+        this.actionsOrderer = actionsOrderer;
+    }
+
+    /**
+     * Starts the battle's gameplay.
      */
     public run(): void {
         const queue: Queue = new Queue();
@@ -28,15 +50,13 @@ export class Main extends Animator {
             this.introductions.run(next);
         });
 
-        queue.run((): void => this.waitForActions(this.battleInfo));
+        queue.run((): void => this.waitForActions());
     }
 
     /**
      * Waits for actions from each team's selector.
-     * 
-     * @param battleInfo   State for the ongoing battle.
      */
-    private waitForActions(battleInfo: IBattleInfo): void {
+    private waitForActions(): void {
         const actions: Partial<IUnderEachTeam<IAction>> = {};
         let completed: number = 0;
 
@@ -47,17 +67,19 @@ export class Main extends Animator {
             }
         };
 
-        battleInfo.teams.opponent.selector.nextAction(
-            battleInfo,
+        this.battleInfo.teams.opponent.selector.nextAction(
+            this.battleInfo,
+            Team.opponent,
             (action: IAction): void => {
-                actions.opponent = action;
+                actions[Team[Team.opponent]] = action;
                 onChoice();
             });
 
-        battleInfo.teams.player.selector.nextAction(
-            battleInfo,
+        this.battleInfo.teams.player.selector.nextAction(
+            this.battleInfo,
+            Team.player,
             (action: IAction): void => {
-                actions.opponent = action;
+                actions[Team[Team.player]] = action;
                 onChoice();
             });
     }
@@ -68,6 +90,12 @@ export class Main extends Animator {
      * @param actions   Chosen actions by the teams.
      */
     private executeActions(actions: IUnderEachTeam<IAction>): void {
-        console.log("Executing", actions);
+        const queue: Queue = new Queue();
+
+        for (const action of this.actionsOrderer(actions)) {
+            queue.add((next: () => void): void => this.actions.run(action, next));
+        }
+
+        queue.run((): void => this.waitForActions());
     }
 }

@@ -3,12 +3,17 @@ import { Main as MainAnimator } from "./animators/Main";
 import { IBattleInfo, IBattleOptions, IBattleTeam } from "./Battles";
 import { IBattleMovr, IBattleMovrSettings } from "./IBattleMovr";
 import { ISelectorFactories } from "./Selectors";
-import { ITeamBase, ITeamDescriptor } from "./Teams";
+import { IActionsOrderer, ITeamBase, ITeamDescriptor } from "./Teams";
 
 /**
  * Drives RPG-like battles between two teams of actors.
  */
 export class BattleMovr implements IBattleMovr {
+    /**
+     * Selector factories keyed by type name.
+     */
+    private readonly actionsOrderer: IActionsOrderer;
+
     /**
      * Animations for various battle activities.
      */
@@ -17,7 +22,7 @@ export class BattleMovr implements IBattleMovr {
     /**
      * Selector factories keyed by type name.
      */
-    private readonly selectorFactories: ISelectorFactories = {};
+    private readonly selectorFactories: ISelectorFactories;
 
     /**
      * Animator for the current battle, if one is happening.
@@ -35,6 +40,7 @@ export class BattleMovr implements IBattleMovr {
      * @param settings   Settings to be used for initialization.
      */
     public constructor(settings: IBattleMovrSettings) {
+        this.actionsOrderer = settings.actionsOrderer;
         this.animations = settings.animations;
         this.selectorFactories = settings.selectorFactories;
     }
@@ -70,10 +76,12 @@ export class BattleMovr implements IBattleMovr {
             }
         };
 
-        this.animator = new MainAnimator({
-            animations: this.animations,
-            battleInfo: this.battleInfo
-        });
+        this.animator = new MainAnimator(
+            {
+                animations: this.animations,
+                battleInfo: this.battleInfo
+            },
+            this.actionsOrderer);
 
         this.animator.run();
 
