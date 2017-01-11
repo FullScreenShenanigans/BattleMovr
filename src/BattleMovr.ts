@@ -94,10 +94,17 @@ export class BattleMovr implements IBattleMovr {
      * @param outcome   Why the battle stopped.
      */
     public stopBattle(outcome: BattleOutcome): void {
-        this.animator = undefined;
-        this.battleInfo = undefined;
+        if (!this.battleInfo) {
+            throw new Error(`No battle is happening.`);
+        }
 
-        this.animations.complete(outcome);
+        this.animations.complete(
+            outcome,
+            (): void => {
+                this.animator = undefined;
+                this.battleInfo = undefined;
+            });
+
     }
 
     /**

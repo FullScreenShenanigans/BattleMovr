@@ -1,4 +1,4 @@
-import { IAnimations } from "./Animations";
+import { BattleOutcome, IAnimations } from "./Animations";
 import { IBattleInfo, IBattleOptions } from "./Battles";
 import { ISelectorFactories } from "./Selectors";
 import { IActionsOrderer } from "./Teams";
@@ -39,4 +39,11 @@ export interface IBattleMovr {
      * @returns Battle info for the new battle.
      */
     startBattle(options: IBattleOptions): IBattleInfo;
+
+    /**
+     * Stops the current battle.
+     * 
+     * @param outcome   Why the battle stopped.
+     */
+    stopBattle(outcome: BattleOutcome): void;
 }

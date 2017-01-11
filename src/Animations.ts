@@ -85,9 +85,10 @@ export interface IAnimations {
  * Animation for when the battle is complete.
  * 
  * @param outcome   Descriptor of what finished the battle.
+ * @param onComplete   Callback for when it's safe to dispose of battle info.
  */
 export interface IOnBattleComplete {
-    (outcome: BattleOutcome): void;
+    (outcome: BattleOutcome, onComplete: () => void): void;
 }
 
 /**
