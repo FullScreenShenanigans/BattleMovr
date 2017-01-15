@@ -1,7 +1,8 @@
+import { IActor } from "./Actors";
 import { BattleOutcome, IAnimations } from "./Animations";
 import { IBattleInfo, IBattleOptions } from "./Battles";
 import { ISelectorFactories } from "./Selectors";
-import { IActionsOrderer } from "./Teams";
+import { IActionsOrderer, Team } from "./Teams";
 
 /**
  * Settings to initialize a new IBattleMovr.
@@ -46,4 +47,12 @@ export interface IBattleMovr {
      * @param outcome   Why the battle stopped.
      */
     stopBattle(outcome: BattleOutcome): void;
+
+    /**
+     * Switches the selected actor for a team.
+     * 
+     * @param team   Team switching actors.
+     * @param newActor   New selected actor for the team.
+     */
+    switchSelectedActor(team: Team, newActor: IActor): void;
 }

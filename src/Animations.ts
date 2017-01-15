@@ -1,4 +1,4 @@
-import { IOnActions } from "./Actions";
+import { IOnAction, IOnActions, ISwitchAction } from "./Actions";
 import { IOnIntroduction } from "./animators/Introductions";
 
 /**
@@ -128,6 +128,11 @@ export interface ISwitchingAnimations {
      * Animation for an actor getting knocked out.
      */
     knockout: IOnKnockout;
+
+    /**
+     * Animation for actors being swapped.
+     */
+    switch: IOnAction<ISwitchAction>;
 }
 
 /**

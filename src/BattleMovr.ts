@@ -1,9 +1,10 @@
+import { IActor } from "./Actors";
 import { BattleOutcome, IAnimations } from "./Animations";
 import { Main as MainAnimator } from "./animators/Main";
 import { IBattleInfo, IBattleOptions, IBattleTeam } from "./Battles";
 import { IBattleMovr, IBattleMovrSettings } from "./IBattleMovr";
 import { ISelectorFactories } from "./Selectors";
-import { IActionsOrderer, ITeamBase, ITeamDescriptor } from "./Teams";
+import { IActionsOrderer, ITeamBase, ITeamDescriptor, Team } from "./Teams";
 
 /**
  * Drives RPG-like battles between two teams of actors.
@@ -86,6 +87,30 @@ export class BattleMovr implements IBattleMovr {
         this.animator.run();
 
         return this.battleInfo;
+    }
+
+    /**
+     * Switches the selected actor for a team.
+     * 
+     * @param team   Team switching actors.
+     * @param newActor   New selected actor for the team.
+     */
+    public switchSelectedActor(team: Team, newActor: IActor): void {
+        if (!this.battleInfo) {
+            throw new Error(`No battle is happening.`);
+        }
+
+        const battleTeam: IBattleTeam = this.battleInfo.teams[Team[team]];
+        const oldActor: IActor = battleTeam.selectedActor;
+
+        if (oldActor === newActor) {
+            throw new Error(`Cannot switch to the currently selected actor.`);
+        }
+
+        battleTeam.actors[battleTeam.actors.indexOf(newActor)] = oldActor;
+        battleTeam.actors[battleTeam.selectedIndex] = newActor;
+
+        battleTeam.selectedActor = newActor;
     }
 
     /**

@@ -3,16 +3,6 @@
  */
 export interface IActor {
     /**
-     * How many experience points the actor has.
-     */
-    experience: number;
-
-    /**
-     * Power level the actor is.
-     */
-    level: number;
-
-    /**
      * Battle moves the actor knows.
      */
     moves: IMove[];
@@ -26,11 +16,6 @@ export interface IActor {
      * Battle attribute statistics.
      */
     statistics: IStatistics;
-
-    /**
-     * Any current status effect.
-     */
-    status?: string;
 
     /**
      * Sprite title for the actor's Thing.

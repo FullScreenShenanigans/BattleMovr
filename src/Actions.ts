@@ -1,14 +1,15 @@
 import { IActor } from "./Actors";
+import { ITeamAndAction } from "./Teams";
 
 /**
  * Animation for when a team performs a move action.
  * 
- * @param action   Action being performed.
+ * @param teamAction   Team and action being performed.
  * @param onComplete   Callback for when the action is done.
  * @type TAction   Type of action being performed.
  */
 export interface IOnAction<TAction extends IAction> {
-    (action: TAction, onComplete: () => void): void;
+    (teamAction: ITeamAndAction<TAction>, onComplete: () => void): void;
 }
 
 /**

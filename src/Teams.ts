@@ -103,12 +103,14 @@ export interface ITeamAndActor {
 
 /**
  * An action with the team that wants to execute it.
+ * 
+ * @type TAction   Type of action being performed.
  */
-export interface ITeamAndAction {
+export interface ITeamAndAction<TAction extends IAction> {
     /**
      * Action chosen by the team.
      */
-    action: IAction;
+    action: TAction;
 
     /**
      * Team and actor that chose the action.
@@ -128,5 +130,5 @@ export interface ITeamAndAction {
  * @returns Team actions ordered for battle.
  */
 export interface IActionsOrderer {
-    (actions: IUnderEachTeam<IAction>): ITeamAndAction[];
+    (actions: IUnderEachTeam<IAction>): ITeamAndAction<IAction>[];
 }

@@ -37,9 +37,9 @@ export interface IBattleInfo {
  */
 export interface IBattleTeam extends ITeam {
     /**
-     * Real order of actors in the current battle.
+     * Original (immutable) order of actors in the current battle.
      */
-    orderedActors: IActor[];
+    readonly orderedActors: IActor[];
 
     /**
      * Currently selected actor.
