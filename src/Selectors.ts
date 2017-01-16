@@ -16,6 +16,15 @@ export interface IOnChoice {
  */
 export interface ISelector {
     /**
+     * Reacts to an actor getting knocked out.
+     * 
+     * @param battleInfo   State for an ongoing battle.
+     * @param team   Which team is selecting an action.
+     * @param onChoice   Callback for when this is done.
+     */
+    afterKnockout(battleInfo: IBattleInfo, team: Team, onComplete: () => void): void;
+
+    /**
      * Determines the next action to take.
      * 
      * @param battleInfo   State for an ongoing battle.

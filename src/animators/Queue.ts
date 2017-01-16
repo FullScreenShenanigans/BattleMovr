@@ -14,7 +14,7 @@ export class Queue {
     /**
      * Callbacks waiting to be run.
      */
-    private queuedCallbacks: IQueueCallback[] = [];
+    private readonly queuedCallbacks: IQueueCallback[] = [];
 
     /**
      * Queues an callback, if it exists.
@@ -40,5 +40,12 @@ export class Queue {
         } else {
             onComplete();
         }
+    }
+
+    /**
+     * Removes any pending queued callbacks.
+     */
+    public clear(): void {
+        this.queuedCallbacks.length = 0;
     }
 }
