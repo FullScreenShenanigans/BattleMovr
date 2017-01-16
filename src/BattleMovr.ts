@@ -47,6 +47,13 @@ export class BattleMovr implements IBattleMovr {
     }
 
     /**
+     * @returns Whether there is a current battle.
+     */
+    public inBattle(): boolean {
+        return !!this.battleInfo;
+    }
+
+    /**
      * @returns Battle info for the current battle.
      */
     public getBattleInfo(): IBattleInfo {
@@ -117,8 +124,9 @@ export class BattleMovr implements IBattleMovr {
      * Stops the current battle.
      * 
      * @param outcome   Why the battle stopped.
+     * @param onComplete   Callback for when this is over.
      */
-    public stopBattle(outcome: BattleOutcome): void {
+    public stopBattle(outcome: BattleOutcome, onComplete?: () => void): void {
         if (!this.battleInfo) {
             throw new Error(`No battle is happening.`);
         }
@@ -128,6 +136,10 @@ export class BattleMovr implements IBattleMovr {
             (): void => {
                 this.animator = undefined;
                 this.battleInfo = undefined;
+
+                if (onComplete) {
+                    onComplete();
+                }
             });
 
     }

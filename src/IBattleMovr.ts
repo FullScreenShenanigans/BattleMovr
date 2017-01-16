@@ -29,6 +29,11 @@ export interface IBattleMovrSettings {
  */
 export interface IBattleMovr {
     /**
+     * @returns Whether there is a current battle.
+     */
+    inBattle(): boolean;
+
+    /**
      * @returns Battle info for the current battle.
      */
     getBattleInfo(): IBattleInfo;
@@ -45,8 +50,9 @@ export interface IBattleMovr {
      * Stops the current battle.
      * 
      * @param outcome   Why the battle stopped.
+     * @param onComplete   Callback for when this is done.
      */
-    stopBattle(outcome: BattleOutcome): void;
+    stopBattle(outcome: BattleOutcome, onComplete?: () => void): void;
 
     /**
      * Switches the selected actor for a team.
