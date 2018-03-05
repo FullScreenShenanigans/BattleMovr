@@ -52,16 +52,16 @@ const battleMover = new BattleMovr({
         opponent: {
             actions: {
                 flee(teamAction: ITeamAndAction<IFleeAction>, onComplete: () => void): void {
-                    // Animates the team choosing to flee
+                    // Animates the team choosing to flee.
                 },
                 item(teamAction: ITeamAndAction<IItemAction>, onComplete: () => void): void {
-                    // Animates the team choosing to use an item
+                    // Animates the team choosing to use an item.
                 },
                 move(teamAction: ITeamAndAction<IMoveAction>, onComplete: () => void): void {
-                    // Animates the team choosing to use an actor move
+                    // Animates the team choosing to use an actor move.
                 },
                 switch(teamAction: ITeamAndAction<ISwitchAction>, onComplete: () => void): void {
-                    // Animates the team choosing to switch actors
+                    // Animates the team choosing to switch actors.
                 },
             },
             healthChange(health: number, onComplete: () => void): void {
