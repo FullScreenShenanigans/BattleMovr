@@ -41,8 +41,6 @@ There are four types of actions a team may choose to take:
 ### Constructor
 
 ```typescript
-import { BattleMovr, IAction, IUnderEachTeam } from "battlemovr";
-
 const battleMover = new BattleMovr({
     actionsOrderer(actions: IUnderEachTeam<IAction>): ITeamAndAction<IAction>[] {
         // Returns the actions in the order they should occur.
