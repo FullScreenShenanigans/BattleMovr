@@ -7,6 +7,21 @@ import { ISelectorFactories } from "./Selectors";
 import { IActionsOrderer, ITeamBase, ITeamDescriptor, Team } from "./Teams";
 
 /**
+ * Finds the index of the first alive actor
+ *
+ * @param actors   A list of actors to be sent out into battle.
+ * @returns Index of the first alive actor.
+ */
+const findFirstAliveIndex = (actors: IActor[]) => {
+    for (let i = 0; i < actors.length; ++i) {
+        if (actors[i].statistics.health.current !== 0) {
+            return i;
+        }
+    }
+    throw new Error("Cannot create team since no actors are alive.");
+};
+
+/**
  * Drives RPG-like battles between two teams of actors.
  */
 export class BattleMovr implements IBattleMovr {
@@ -147,27 +162,7 @@ export class BattleMovr implements IBattleMovr {
             });
 
     }
-    
-    /**
-     * Finds the index of the first alive actor
-     *
-     * @param actors   A list of actors to be sent out into battle.
-     * @returns Index of the first alive actor.
-     */
-    private FindFirstAliveIndex(actors: IActor[]) : number
-    {
-        let i = 0;
-        for(i = 0; i < actors.length; ++i)
-        {
-            if(actors[i].statistics.health.current !== 0)
-            {
-                return i;
-            }
-        }
 
-        return i;
-    }
-    
     /**
      * Creates a battle team from starting info.
      *
@@ -180,7 +175,7 @@ export class BattleMovr implements IBattleMovr {
             throw new Error(`Unknown selector type: '${team.selector}.`);
         }
 
-        let firstAliveIndex = this.FindFirstAliveIndex(team.actors);
+        const firstAliveIndex = findFirstAliveIndex(team.actors);
         return {
             ...team,
             orderedActors: team.actors.slice(),
