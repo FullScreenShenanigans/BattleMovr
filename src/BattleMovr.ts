@@ -7,17 +7,18 @@ import { ISelectorFactories } from "./Selectors";
 import { IActionsOrderer, ITeamBase, ITeamDescriptor, Team } from "./Teams";
 
 /**
- * Finds the index of the first alive actor
+ * Finds the index of the first alive actor.
  *
  * @param actors   A list of actors to be sent out into battle.
  * @returns Index of the first alive actor.
  */
 const findFirstAliveIndex = (actors: IActor[]) => {
-    for (let i = 0; i < actors.length; ++i) {
+    for (let i = 0; i < actors.length; i += 1) {
         if (actors[i].statistics.health.current !== 0) {
             return i;
         }
     }
+
     throw new Error("Cannot create team since no actors are alive.");
 };
 
