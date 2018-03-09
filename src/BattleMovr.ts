@@ -147,7 +147,26 @@ export class BattleMovr implements IBattleMovr {
             });
 
     }
-
+    
+    /**
+     * Finds the first alive actor
+     *
+     * @param actors   A list of actors to be sent out into battle.
+     * @returns Index of the first alive actor.
+     */
+    private FindFirstIndex(actors: IActor[]) : number
+    {
+        let i = 0;
+        for(i = 0; i < actors.length; ++i)
+        {
+            if(actors[i].statistics.health.current !== 0)
+            {
+                return i;
+            }
+        }
+        return i;
+    }
+    
     /**
      * Creates a battle team from starting info.
      *
@@ -159,12 +178,13 @@ export class BattleMovr implements IBattleMovr {
         if (selectorFactory === undefined) {
             throw new Error(`Unknown selector type: '${team.selector}.`);
         }
+        let firstIndex = this.FindFirstIndex(team.actors);
 
         return {
             ...team,
             orderedActors: team.actors.slice(),
-            selectedActor: team.actors[0],
-            selectedIndex: 0,
+            selectedActor: team.actors[firstIndex],
+            selectedIndex: firstIndex,
             selector: selectorFactory(),
         };
     }
