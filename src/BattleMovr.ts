@@ -12,7 +12,7 @@ import { IActionsOrderer, ITeamBase, ITeamDescriptor, Team } from "./Teams";
  * @param actors   A list of actors to be sent out into battle.
  * @returns Index of the first alive actor.
  */
-const findFirstAliveIndex = (actors: IActor[]) => {
+const findFirstAliveIndex = (actors: IActor[]): number => {
     for (let i = 0; i < actors.length; i += 1) {
         if (actors[i].statistics.health.current !== 0) {
             return i;
