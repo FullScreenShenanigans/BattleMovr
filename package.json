@@ -10,7 +10,7 @@
   "description": "Drives RPG-like battles between two teams of actors.",
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/lodash": "^4.14.123",
+    "@types/lodash": "^4.14.153",
     "@types/lolex": "^3.1.1",
     "@types/mocha": "^5.2.6",
     "@types/sinon": "^7.0.11",
